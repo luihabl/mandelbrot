@@ -1,6 +1,10 @@
 #include <tinysdl.h>
+#include <string>
+
+#include "shaders/shaders.h"
 
 using namespace TinySDL;
+
 
 int main(int argc, char *argv[]) {
 
@@ -12,10 +16,13 @@ int main(int argc, char *argv[]) {
     BatchRenderer renderer;
     renderer.setup();
 
-    Shader shader = Shader::default_sprite_shaders();
+    // Shader shader = Shader::default_sprite_shaders();
+
+    Shader shader = Shader::from_source(MB::vertex_src, MB::frag_src);
+
     shader.use().set_mat4x4("projection", window_projection); 
 
-    Texture sprite_tex = Texture::from_file("sprite.png");
+    // Texture sprite_tex = Texture::from_file("sprite.png");
 
     SDL_Event event; 
     bool quit = false;
@@ -25,8 +32,8 @@ int main(int argc, char *argv[]) {
         Graphics::viewport(screen_w, screen_h);
         Graphics::clear(Color::black);
 
-        renderer.set_texture(&sprite_tex);
-        renderer.draw_tex({50.0f, 150.0f});
+        // renderer.set_texture(&sprite_tex);
+        // renderer.draw_tex({50.0f, 150.0f});
 
         renderer.render();
         SDL_GL_SwapWindow(window);
