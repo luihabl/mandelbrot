@@ -16,11 +16,10 @@ int main(int argc, char *argv[]) {
     BatchRenderer renderer;
     renderer.setup();
 
-    // Shader shader = Shader::default_sprite_shaders();
+    Shader mandelbrot_shader = Shader::from_source(MB::vertex_src, MB::frag_src);
+    Shader sprite_shader = Shader::default_sprite_shaders();
 
-    Shader shader = Shader::from_source(MB::vertex_src, MB::frag_src);
-
-    shader.use().set_mat4x4("projection", window_projection); 
+    mandelbrot_shader.use().set_mat4x4("projection", window_projection); 
 
     // Texture sprite_tex = Texture::from_file("sprite.png");
 
@@ -34,6 +33,7 @@ int main(int argc, char *argv[]) {
 
         // renderer.set_texture(&sprite_tex);
         // renderer.draw_tex({50.0f, 150.0f});
+        renderer.draw_rect_fill({0, 0, 512, 256}, Color::white);
 
         renderer.render();
         SDL_GL_SwapWindow(window);
