@@ -19,17 +19,21 @@ int main(int argc, char *argv[]) {
     Shader mandelbrot_shader = Shader::from_source(MB::vertex_src, MB::frag_src);
     // Shader sprite_shader = Shader::default_sprite_shaders();
 
-    mandelbrot_shader.use().set_mat4x4("projection", window_projection); 
-    mandelbrot_shader.set_vec2("window_size", {(float) screen_w, (float) screen_h});
-    mandelbrot_shader.set_vec2("offset", {0, 0});
-    mandelbrot_shader.set_float("zoom", 50.0f);
+
 
     // Texture sprite_tex = Texture::from_file("sprite.png");
     bool is_clicking = false;
     IVec2 mouse_pos = {0, 0};
     IVec2 mouse_initial_pos = {0, 0};
-    Vec2 current_offset = {0, 0};
-    float zoom = 50.0f;
+    
+    float zoom = 120.0f;
+    Vec2 current_offset = {-256 / zoom, -128 / zoom};
+
+
+    mandelbrot_shader.use().set_mat4x4("projection", window_projection); 
+    mandelbrot_shader.set_vec2("window_size", {(float) screen_w, (float) screen_h});
+    mandelbrot_shader.set_vec2("offset", current_offset);
+    mandelbrot_shader.set_float("zoom", zoom);
 
     SDL_Event event; 
     bool quit = false;
