@@ -1,5 +1,8 @@
 R"(
 #version 460 core
+
+precision highp float;
+
 // in vec2 uv;
 in vec2 pos;
 in vec4 color;
@@ -10,13 +13,8 @@ uniform float zoom;
 uniform vec2 offset;
 uniform vec2 window_size;
 
-#define MAX_ITERATIONS 500
+#define MAX_ITERATIONS 100 // 500
 
-// float grid(vec2 st, float res)
-// {
-//   vec2 grid = fract(st*res);
-//   return (step(res,grid.x) * step(res,grid.y));
-// }
 
 int get_iterations()
 {
@@ -53,7 +51,7 @@ vec4 calc_color()
     }
  
     float iterations = float(iter) / MAX_ITERATIONS;    
-    return vec4(0.0f, iterations, 0.0f, 1.0f);
+    return vec4(iterations, iterations, 2 * iterations, 1.0f);
 }
 
 // uniform sampler2D image;
