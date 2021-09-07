@@ -5,6 +5,12 @@
 
 #include "shaders/shaders.h"
 
+#include "imgui.h" 
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
+#define CONTROL_FLOAT(var, vmin, vmax) ImGui::SliderFloat(#var, &var, vmin, vmax, "%.3f");
+
 using namespace TinySDL;
 typedef Vec<double, 2> DVec2;
 
@@ -12,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     int screen_w = 512, screen_h = 256;
     
-    SDL_Window * window = Window::init("Window Title", screen_w, screen_h);
+    SDL_Window * window = Window::init("Mandelbrot set", screen_w, screen_h);
     Mat4x4 window_projection = LinAlg::ortho(0, (float) screen_w, (float) screen_h, 0, -1, 1);
     // Mat4x4 window_projection = Mat4x4::identity;
     
@@ -38,10 +44,38 @@ int main(int argc, char *argv[]) {
     mandelbrot_shader.set_dvec2("offset", current_offset);
     mandelbrot_shader.set_double("zoom", zoom);
 
+
+    mandelbrot_shader.set_double("radius", 4.0);
+
+    float scale_exp = 0.5f;
+    mandelbrot_shader.set_float("scale_exp", scale_exp);
+
+    int max_iter = 200;
+    mandelbrot_shader.set_int("max_iter", max_iter);
+
+
+
+    // Setup Dear Imgui stuff goes here ----
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io; 
+
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplSDL2_InitForOpenGL(window, Window::get_context());
+    ImGui_ImplOpenGL3_Init("#version 460");
+
+
+
     SDL_Event event; 
     bool quit = false;
     while(!quit) {
         while (SDL_PollEvent(&event) != 0) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+
+            if(io.WantCaptureMouse) break;
+
             if (event.type == SDL_QUIT) quit = true;
             if (event.type == SDL_WINDOWEVENT) {
                 if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -92,8 +126,47 @@ int main(int argc, char *argv[]) {
         renderer.draw_rect_fill({0, 0, (float)screen_w, (float)screen_h}, Color::white);
 
         renderer.render();
+
+
+
+                // Draw Dear Imgui stuff goes here ----
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(window);
+        ImGui::NewFrame();
+
+        ImGui::Begin("Quad");                          
+
+        // ImGui::SliderFloat2("offset", &offset[0], -1.0f, 1.0f);
+        // ImGui::ColorEdit3("Bakcground color", background_color.data);
+        // ImGui::ColorEdit3("Color - y", &color_y[0]);
+
+        ImGui::Text("Mandelbrot set parameters (%.1f FPS)", ImGui::GetIO().Framerate);
+
+        ImGui::Text("Zoom: %.3ex", zoom);
+
+        if(ImGui::SliderFloat("Scale expoent", &scale_exp, 0.0f, 2.0f, "%.3f"))
+        {
+            mandelbrot_shader.set_float("scale_exp", scale_exp);
+        }
+        if(ImGui::SliderInt("Max. iterations", &max_iter, 0, 2000))
+        {
+            mandelbrot_shader.set_int("max_iter", max_iter);
+        }
+
+
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
         SDL_GL_SwapWindow(window);
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     
     return 0;
 }
