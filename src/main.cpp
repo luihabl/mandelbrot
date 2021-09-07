@@ -1,9 +1,12 @@
 #include <tinysdl.h>
 #include <string>
 
+#include <glad/glad.h>
+
 #include "shaders/shaders.h"
 
 using namespace TinySDL;
+typedef Vec<double, 2> DVec2;
 
 int main(int argc, char *argv[]) {
 
@@ -26,14 +29,14 @@ int main(int argc, char *argv[]) {
     IVec2 mouse_pos = {0, 0};
     IVec2 mouse_initial_pos = {0, 0};
     
-    float zoom = 120.0f;
-    Vec2 current_offset = {-256 / zoom, -128 / zoom};
+    double zoom = 120.0;
+    DVec2 current_offset = {-256 / zoom, -128 / zoom};
 
 
     mandelbrot_shader.use().set_mat4x4("projection", window_projection); 
-    mandelbrot_shader.set_vec2("window_size", {(float) screen_w, (float) screen_h});
-    mandelbrot_shader.set_vec2("offset", current_offset);
-    mandelbrot_shader.set_float("zoom", zoom);
+    mandelbrot_shader.set_dvec2("window_size", {(double) screen_w, (double) screen_h});
+    mandelbrot_shader.set_dvec2("offset", current_offset);
+    mandelbrot_shader.set_double("zoom", zoom);
 
     SDL_Event event; 
     bool quit = false;
@@ -53,25 +56,25 @@ int main(int argc, char *argv[]) {
             }
             else if(event.type == SDL_MOUSEBUTTONUP) {
                 is_clicking = false;
-                Vec2 delta_offset = (mouse_initial_pos.cast_to<float>() - mouse_pos.cast_to<float>()) / zoom;
+                DVec2 delta_offset = (mouse_initial_pos.cast_to<double>() - mouse_pos.cast_to<double>()) / zoom;
                 current_offset = current_offset + delta_offset;
             }
             if(event.type == SDL_MOUSEWHEEL)
             {
-                float old_zoom = zoom;
+                double old_zoom = zoom;
 
                 if (event.wheel.y < 0)
-                    zoom *= 0.95f;
+                    zoom *= 0.95;
 
                 if (event.wheel.y > 0)
-                    zoom *= 1.05f;
+                    zoom *= 1.05;
 
                 SDL_GetMouseState(&mouse_pos[0], &mouse_pos[1]);
 
-                current_offset = current_offset + (1.0f / old_zoom - 1.0f/zoom) * mouse_pos.cast_to<float>();
+                current_offset = current_offset + (1.0/old_zoom - 1.0/zoom) * mouse_pos.cast_to<double>();
 
-                mandelbrot_shader.set_float("zoom", zoom);
-                mandelbrot_shader.set_vec2("offset", current_offset);
+                mandelbrot_shader.set_double("zoom", zoom);
+                mandelbrot_shader.set_dvec2("offset", current_offset);
             }
 
         } 
@@ -79,8 +82,8 @@ int main(int argc, char *argv[]) {
 
         if(is_clicking){
             SDL_GetMouseState(&mouse_pos[0], &mouse_pos[1]);
-            Vec2 delta_offset = (mouse_initial_pos.cast_to<float>() - mouse_pos.cast_to<float>()) / zoom;
-            mandelbrot_shader.set_vec2("offset", current_offset + delta_offset);
+            DVec2 delta_offset = (mouse_initial_pos.cast_to<double>() - mouse_pos.cast_to<double>()) / zoom;
+            mandelbrot_shader.set_dvec2("offset", current_offset + delta_offset);
         }
 
         Graphics::viewport(screen_w, screen_h);
