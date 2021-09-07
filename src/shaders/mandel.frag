@@ -13,9 +13,9 @@ uniform double zoom;
 uniform dvec2 offset;
 uniform dvec2 window_size;
 
-uniform int max_iter = 200;
-uniform double radius = 4.0;
-uniform float scale_exp = 0.5f;
+uniform int max_iter;
+uniform double radius;
+uniform float scale_exp;
 
 vec4 spectral_color(float l) // RGB <0,1> <- lambda l <400,700> [nm]
 {
@@ -72,13 +72,8 @@ double get_iterations()
         ++iterations;
     }
 
-
-
     float modulus = sqrt(float(dist));
-    float mu = float(iterations) + 1 - (log(log(modulus)) / log(2.0));
-
-
-
+    float mu = float(iterations) + 1 - (log2(log(modulus)));
     return double(mu);
 }
 
@@ -87,14 +82,11 @@ vec4 calc_color()
     double iter = get_iterations();
     if (iter == (max_iter+2))
     {
-        // gl_FragDepth = 0.0f;
         return vec4(0.0f, 0.0f, 0.0f, 1.0f);
     }
  
-    float it = float(iter) / float(max_iter+2);    
-    
-    return(spectral_color( 400.0+(300.0*pow(it, scale_exp)) ));
-    // return vec4(iterations, iterations, 2 * iterations, 1.0f);
+    float it = pow(float(iter) / float(max_iter+2), scale_exp);
+    return(spectral_color(400.0f+(300.0f*it)));
 }
 
 // uniform sampler2D image;
