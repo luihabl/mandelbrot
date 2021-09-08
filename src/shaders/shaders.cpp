@@ -6,7 +6,8 @@ namespace MB
 {
     namespace 
     {
-        std::map<std::string, std::string> colormaps = 
+        
+        std::vector<ColorMapSrc> colormaps = 
         {
             // {"gnuplot",
             // #include "colormaps/gnuplot.frag"
@@ -337,7 +338,7 @@ namespace MB
             ;
     }
 
-    std::map<std::string, std::string>& get_colormaps()
+    std::vector<ColorMapSrc>& get_colormaps()
     {
         return colormaps;
     }

@@ -26,10 +26,17 @@ int main(int argc, char *argv[]) {
     renderer.setup();
 
     auto& colormaps = MB::get_colormaps();
-    std::string frag_src = MB::get_frag_src();
-    frag_src += colormaps["IDL_Plasma"];
+    std::vector<const char*> cm_labels;
+    for (auto [label, src] : colormaps)
+    {
+        cm_labels.push_back(label);
+    }
 
-    Shader mandelbrot_shader = Shader::from_source(MB::get_vertex_src(),  frag_src.c_str());
+    
+    std::string frag_src = MB::get_frag_src();
+
+    int current_cm = 0;
+    Shader mandelbrot_shader = Shader::from_source(MB::get_vertex_src(),  (frag_src + colormaps[current_cm].src).c_str());
     // Shader sprite_shader = Shader::default_sprite_shaders();
 
 
@@ -136,8 +143,6 @@ int main(int argc, char *argv[]) {
         while (SDL_PollEvent(&event) != 0) {
             ImGui_ImplSDL2_ProcessEvent(&event);
 
-            if(io.WantCaptureMouse) break;
-
             if (event.type == SDL_QUIT) quit = true;
             if (event.type == SDL_WINDOWEVENT) {
                 if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -146,6 +151,9 @@ int main(int argc, char *argv[]) {
                     mandelbrot_shader.set_vec2("window_size", {(float) screen_w, (float) screen_h});
                 }
             }
+
+            if(io.WantCaptureMouse) break;
+
             if (event.type == SDL_MOUSEBUTTONDOWN) {
                 is_clicking = true;
                 SDL_GetMouseState(&mouse_initial_pos[0], &mouse_initial_pos[1]);
@@ -213,6 +221,25 @@ int main(int argc, char *argv[]) {
             
             mandelbrot_shader.set_int("min_iter_range", iter_range[0]);
             mandelbrot_shader.set_int("max_iter_range", iter_range[1]);
+        }
+
+        
+        if(ImGui::Combo("Colormap", &current_cm, cm_labels.data(), (int)cm_labels.size()))
+        {
+            Log::debug("changed!");
+
+            mandelbrot_shader.del();
+            mandelbrot_shader = Shader::from_source(MB::get_vertex_src(),  (frag_src + colormaps[current_cm].src).c_str());
+            mandelbrot_shader.use();
+
+            mandelbrot_shader.set_int("min_iter_range", iter_range[0]);
+            mandelbrot_shader.set_int("max_iter_range", iter_range[1]);
+            mandelbrot_shader.set_float("scale_exp", scale_exp);
+            mandelbrot_shader.set_dvec2("offset", current_offset);
+            mandelbrot_shader.set_mat4x4("projection", LinAlg::ortho(0, (float) screen_w, (float) screen_h, 0, -1, 1)); 
+            mandelbrot_shader.set_vec2("window_size", {(float) screen_w, (float) screen_h});
+            mandelbrot_shader.set_double("radius", 4.0);
+            mandelbrot_shader.set_double("zoom", zoom);
         }
 
 
