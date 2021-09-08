@@ -33,4 +33,6 @@
 
 # Misc
 .vscode
+.vs
+CMakeSettings.json
 build

@@ -17,6 +17,7 @@ ${IMGUI_SRC}
 include_directories(lib/imgui)
 target_link_libraries(mandelbrot tinysdl)
 
+set(SDL2_DLL "" CACHE FILEPATH "SDL2 DLL Path")
 if (EXISTS ${SDL2_DLL})
     add_custom_command(
         TARGET mandelbrot POST_BUILD
