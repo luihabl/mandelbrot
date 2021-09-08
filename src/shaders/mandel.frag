@@ -13,7 +13,10 @@ uniform double zoom;
 uniform dvec2 offset;
 uniform dvec2 window_size;
 
-uniform int max_iter;
+// uniform int max_iter;
+uniform int min_iter_range;
+uniform int max_iter_range;
+
 uniform double radius;
 uniform float scale_exp;
 
@@ -46,7 +49,7 @@ double get_iterations()
 
     double dist = 0.0;
  
-    while (iterations < max_iter)
+    while (iterations < max_iter_range)
     {
         double tmp_real = real;
         real = (real * real - imag * imag) + const_real;
@@ -80,12 +83,15 @@ double get_iterations()
 vec4 calc_color()
 {
     double iter = get_iterations();
-    if (iter == (max_iter+2))
+    if (iter == (max_iter_range+2))
     {
         return vec4(0.0f, 0.0f, 0.0f, 1.0f);
     }
- 
-    float it = pow(float(iter) / float(max_iter+2), scale_exp);
+    
+    // iter = clamp(iter, min_iter_range+2, max_iter_range+2);
+    // iter = max(iter, 0);
+
+    float it = pow(float(iter - double(min_iter_range+2)) / float(max_iter_range - min_iter_range), scale_exp);
     return(spectral_color(400.0f+(300.0f*it)));
 }
 

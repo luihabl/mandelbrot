@@ -17,6 +17,8 @@ int main(int argc, char *argv[]) {
     int screen_w = 512, screen_h = 256;
     
     SDL_Window * window = Window::init("Mandelbrot explorer", screen_w, screen_h);
+    SDL_GL_SetSwapInterval(1); // Enable vsync
+
     Mat4x4 window_projection = LinAlg::ortho(0, (float) screen_w, (float) screen_h, 0, -1, 1);
     // Mat4x4 window_projection = Mat4x4::identity;
     
@@ -45,13 +47,17 @@ int main(int argc, char *argv[]) {
 
     mandelbrot_shader.set_double("radius", 4.0);
 
-    float scale_exp = 0.5f;
+    float scale_exp = 1.0f;
     mandelbrot_shader.set_float("scale_exp", scale_exp);
 
-    int max_iter = 200;
-    mandelbrot_shader.set_int("max_iter", max_iter);
+    // int max_iter = 200;
+    // mandelbrot_shader.set_int("max_iter", max_iter);
 
 
+    int max_iter = 600;
+    IVec2 iter_range = {0, 200};
+    mandelbrot_shader.set_int("min_iter_range", iter_range[0]);
+    mandelbrot_shader.set_int("max_iter_range", iter_range[1]);
 
     // Setup Dear Imgui stuff goes here ----
 
@@ -189,19 +195,20 @@ int main(int argc, char *argv[]) {
         ImGui::SetNextWindowBgAlpha(0.5f);
         ImGui::Begin("Mandelbrot set parameters");                          
 
-        // ImGui::SliderFloat2("offset", &offset[0], -1.0f, 1.0f);
-        // ImGui::ColorEdit3("Bakcground color", background_color.data);
-        // ImGui::ColorEdit3("Color - y", &color_y[0]);
-
         ImGui::Text("Zoom: %.3ex\t\t%.1f FPS", zoom, ImGui::GetIO().Framerate);
 
         if(ImGui::SliderFloat("Scale exponent", &scale_exp, 0.0f, 2.0f, "%.3f"))
         {
             mandelbrot_shader.set_float("scale_exp", scale_exp);
         }
-        if(ImGui::SliderInt("Max. iterations", &max_iter, 0, 2000))
+
+        if(ImGui::SliderInt2("Iteration range", &iter_range[0], 0, max_iter, "%d iter."), ImGuiSliderFlags_AlwaysClamp)
         {
-            mandelbrot_shader.set_int("max_iter", max_iter);
+
+            iter_range[0] = std::clamp(iter_range[0], 0, iter_range[1]);
+            
+            mandelbrot_shader.set_int("min_iter_range", iter_range[0]);
+            mandelbrot_shader.set_int("max_iter_range", iter_range[1]);
         }
 
 
