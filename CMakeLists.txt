@@ -9,6 +9,7 @@ add_subdirectory(lib/tinysdl)
 add_subdirectory(lib/imgui)
 
 add_executable(mandelbrot 
+src/shaders/shaders.cpp
 src/main.cpp
 ${IMGUI_SRC}
 )

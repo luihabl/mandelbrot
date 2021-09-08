@@ -25,7 +25,11 @@ int main(int argc, char *argv[]) {
     BatchRenderer renderer;
     renderer.setup();
 
-    Shader mandelbrot_shader = Shader::from_source(MB::vertex_src, MB::frag_src);
+    auto& colormaps = MB::get_colormaps();
+    std::string frag_src = MB::get_frag_src();
+    frag_src += colormaps["IDL_Plasma"];
+
+    Shader mandelbrot_shader = Shader::from_source(MB::get_vertex_src(),  frag_src.c_str());
     // Shader sprite_shader = Shader::default_sprite_shaders();
 
 
