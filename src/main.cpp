@@ -14,7 +14,7 @@ typedef Vec<double, 2> DVec2;
 
 int main(int argc, char *argv[]) {
 
-    int screen_w = 512, screen_h = 256;
+    int screen_w = 960, screen_h = 580;
     
     SDL_Window * window = Window::init("Mandelbrot explorer", screen_w, screen_h);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
     IVec2 mouse_pos = {0, 0};
     IVec2 mouse_initial_pos = {0, 0};
     
-    double zoom = 120.0;
-    DVec2 current_offset = {-256 / zoom, -128 / zoom};
+    double zoom = 200.0;
+    DVec2 current_offset = {-580 / zoom, -290 / zoom};
 
 
     mandelbrot_shader.use().set_mat4x4("projection", window_projection); 
