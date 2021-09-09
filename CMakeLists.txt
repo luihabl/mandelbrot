@@ -10,6 +10,7 @@ add_subdirectory(lib/imgui)
 
 add_executable(mandelbrot 
 src/shaders/shaders.cpp
+src/gui.cpp
 src/main.cpp
 ${IMGUI_SRC}
 )
