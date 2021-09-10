@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(lib/tinysdl)
 add_subdirectory(lib/imgui)
 
-add_executable(mandelbrot 
+add_executable(mandelbrot MACOSX_BUNDLE WIN32  
 src/shaders/shaders.cpp
 src/gui.cpp
 src/main.cpp
